@@ -8,10 +8,6 @@ import (
 	"net/http"
 )
 
-type rate struct {
-	UahRate int `json:"rate"`
-}
-
 func getRateBTC(w http.ResponseWriter, r *http.Request) {
 	//Get json with bitcoin rate from third-party service
 	response, getRateError := http.Get("https://api.coinstats.app/public/v1/coins?skip=0&limit=1&currency=UAH")
@@ -34,7 +30,7 @@ func getRateBTC(w http.ResponseWriter, r *http.Request) {
 	rateBtcUah := int(coins["coins"][0]["price"])
 
 	//Write response with btc-uah rate
-	writeResponseError := json.NewEncoder(w).Encode(rate{UahRate: rateBtcUah})
+	writeResponseError := json.NewEncoder(w).Encode(rateBtcUah)
 	if writeResponseError != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -43,7 +39,8 @@ func getRateBTC(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	router := mux.NewRouter()
+	apiRouter := router.Host("gses2.app").PathPrefix("/api").Subrouter()
+	apiRouter.HandleFunc("/rate", getRateBTC).Methods("GET")
 
-	router.HandleFunc("/rate", getRateBTC).Methods("GET")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":80", apiRouter))
 }

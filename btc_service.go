@@ -3,16 +3,20 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
+	"gopkg.in/gomail.v2"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 )
 
-const EmailsFileName = "emails.txt"
 const Port = ":80"
 const BtcUahRateUrl = "https://api.coinstats.app/public/v1/coins?skip=0&limit=1&currency=UAH"
+const EmailsFileName = "emails.txt"
+const ServiceEmail = "gses2.app.nechyporchuk@gmail.com"
+const ServiceEmailPassword = "hriendevvanbzuvg"
 
 func main() {
 	router := mux.NewRouter()
@@ -24,17 +28,17 @@ func main() {
 	log.Fatal(http.ListenAndServe(Port, apiRouter))
 }
 
+func recoverInternalError(writer http.ResponseWriter) {
+	if r := recover(); r != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+	}
+}
+
 func getRateBTC(writer http.ResponseWriter, request *http.Request) {
-	defer recoverGetRateError(writer)
+	defer recoverInternalError(writer)
 
 	btcUahRate := getBtcUahRate()
 	returnBtcUahRate(writer, btcUahRate)
-}
-
-func recoverGetRateError(writer http.ResponseWriter) {
-	if r := recover(); r != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-	}
 }
 
 func getBtcUahRate() int {
@@ -74,7 +78,7 @@ func returnBtcUahRate(writer http.ResponseWriter, btcUahRate int) {
 }
 
 func subscribeEmail(writer http.ResponseWriter, request *http.Request) {
-	defer recoverSubscriptionError(writer)
+	defer recoverInternalError(writer)
 
 	parsingError := request.ParseForm()
 	if parsingError != nil {
@@ -94,12 +98,6 @@ func subscribeEmail(writer http.ResponseWriter, request *http.Request) {
 	} else {
 		addEmail(file, email)
 		writer.WriteHeader(http.StatusOK)
-	}
-}
-
-func recoverSubscriptionError(writer http.ResponseWriter) {
-	if r := recover(); r != nil {
-		writer.WriteHeader(http.StatusConflict)
 	}
 }
 
@@ -127,5 +125,38 @@ func addEmail(file *os.File, email string) {
 }
 
 func sendRateToEmails(writer http.ResponseWriter, request *http.Request) {
+	defer recoverInternalError(writer)
 
+	host := "smtp.gmail.com"
+	port := 587
+
+	subject := "Subject: BTC-UAH rate\n"
+	body := fmt.Sprintf("BTC rate in UAH: %d", getBtcUahRate())
+
+	msg := gomail.NewMessage()
+	msg.SetHeader("From", ServiceEmail)
+	msg.SetHeader("Subject", subject)
+	msg.SetBody("text/plain", body)
+
+	dialer := gomail.NewDialer(
+		host,
+		port,
+		ServiceEmail,
+		ServiceEmailPassword,
+	)
+
+	file, openFileError := os.OpenFile(EmailsFileName, os.O_RDONLY|os.O_CREATE, 0)
+	if openFileError != nil {
+		panic(openFileError)
+	}
+	defer file.Close()
+
+	fileScanner := bufio.NewScanner(file)
+	for fileScanner.Scan() {
+		to := fileScanner.Text()
+		msg.SetHeader("To", to)
+		if err := dialer.DialAndSend(msg); err != nil {
+			log.Println(err)
+		}
+	}
 }

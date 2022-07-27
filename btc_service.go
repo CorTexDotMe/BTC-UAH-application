@@ -10,80 +10,122 @@ import (
 	"os"
 )
 
-const emailsFileName = "emails.txt"
+const EmailsFileName = "emails.txt"
+const Port = ":80"
+const BtcUahRateUrl = "https://api.coinstats.app/public/v1/coins?skip=0&limit=1&currency=UAH"
 
 func main() {
 	router := mux.NewRouter()
 	apiRouter := router.Host("gses2.app").PathPrefix("/api").Subrouter()
 	apiRouter.HandleFunc("/rate", getRateBTC).Methods("GET")
 	apiRouter.HandleFunc("/subscribe", subscribeEmail).Methods("POST")
+	apiRouter.HandleFunc("/sendEmails", sendRateToEmails).Methods("POST")
 
-	log.Fatal(http.ListenAndServe(":80", apiRouter))
+	log.Fatal(http.ListenAndServe(Port, apiRouter))
 }
 
 func getRateBTC(writer http.ResponseWriter, request *http.Request) {
-	//Get json with bitcoin rate from third-party service
-	response, getRateError := http.Get("https://api.coinstats.app/public/v1/coins?skip=0&limit=1&currency=UAH")
-	if getRateError != nil {
+	defer recoverGetRateError(writer)
+
+	btcUahRate := getBtcUahRate()
+	returnBtcUahRate(writer, btcUahRate)
+}
+
+func recoverGetRateError(writer http.ResponseWriter) {
+	if r := recover(); r != nil {
 		writer.WriteHeader(http.StatusBadRequest)
-		return
 	}
+}
+
+func getBtcUahRate() int {
+	response := rateServiceHttpGet()
 	defer response.Body.Close()
 
-	//Read json from response
+	return parseJson(readJson(response))
+}
+
+func rateServiceHttpGet() *http.Response {
+	response, getRateError := http.Get(BtcUahRateUrl)
+	if getRateError != nil {
+		panic(getRateError)
+	}
+	return response
+}
+
+func readJson(response *http.Response) []byte {
 	body, readJsonError := ioutil.ReadAll(response.Body)
 	if readJsonError != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(readJsonError)
 	}
+	return body
+}
 
-	//Parse json from third-party service
+func parseJson(jsonWithRate []byte) int {
 	var coins map[string][]map[string]float64
-	json.Unmarshal(body, &coins)
-	rateBtcUah := int(coins["coins"][0]["price"])
+	json.Unmarshal(jsonWithRate, &coins)
+	return int(coins["coins"][0]["price"])
+}
 
-	//Write response with btc-uah rate
-	writeResponseError := json.NewEncoder(writer).Encode(rateBtcUah)
+func returnBtcUahRate(writer http.ResponseWriter, btcUahRate int) {
+	writeResponseError := json.NewEncoder(writer).Encode(btcUahRate)
 	if writeResponseError != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(writeResponseError)
 	}
 }
 
 func subscribeEmail(writer http.ResponseWriter, request *http.Request) {
+	defer recoverSubscriptionError(writer)
+
 	parsingError := request.ParseForm()
 	if parsingError != nil {
-		writer.WriteHeader(http.StatusConflict)
-		return
+		panic(parsingError)
 	}
 
-	success := addEmail(request.Form.Get("email"))
-	if !success {
-		writer.WriteHeader(http.StatusConflict)
-		return
-	}
-}
+	email := request.Form.Get("email")
 
-func addEmail(email string) bool {
-	file, openingError := os.OpenFile(emailsFileName, os.O_RDWR|os.O_CREATE, 0600)
+	file, openingError := os.OpenFile(EmailsFileName, os.O_RDWR|os.O_CREATE, 0600)
 	if openingError != nil {
-		return false
+		panic(openingError)
 	}
 	defer file.Close()
 
+	if alreadySubscribed(file, email) {
+		writer.WriteHeader(http.StatusConflict)
+	} else {
+		addEmail(file, email)
+		writer.WriteHeader(http.StatusOK)
+	}
+}
+
+func recoverSubscriptionError(writer http.ResponseWriter) {
+	if r := recover(); r != nil {
+		writer.WriteHeader(http.StatusConflict)
+	}
+}
+
+func alreadySubscribed(file *os.File, email string) bool {
 	fileScanner := bufio.NewScanner(file)
 	for fileScanner.Scan() {
 		if fileScanner.Text() == email {
-			return false
+			return true
 		}
 	}
+
 	if fileScanner.Err() != nil {
-		return false
+		panic(fileScanner.Err())
 	}
 
-	if _, writingError := file.WriteString(email + "\n"); writingError != nil {
-		return false
-	}
+	return false
+}
 
-	return true
+func addEmail(file *os.File, email string) {
+	_, writingError := file.WriteString(email + "\n")
+
+	if writingError != nil {
+		panic(writingError)
+	}
+}
+
+func sendRateToEmails(writer http.ResponseWriter, request *http.Request) {
+
 }

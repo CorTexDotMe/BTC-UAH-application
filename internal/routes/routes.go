@@ -8,25 +8,28 @@ import (
 	"net/http"
 )
 
-var router *mux.Router
-
 func StartService() {
-	initializeRouter()
-	setHandlers()
-	runService()
+	runService(CreateInitialRouter())
 }
 
-func initializeRouter() {
+func runService(router *mux.Router) {
+	log.Fatal(http.ListenAndServe(utils.Port, router))
+}
+
+func CreateInitialRouter() *mux.Router {
+	router := basicRouterInit()
+	setHandlers(router)
+	return router
+}
+
+func basicRouterInit() *mux.Router {
 	defaultRouter := mux.NewRouter()
-	router = defaultRouter.Host("gses2.app").PathPrefix("/api").Subrouter()
+	router := defaultRouter.Host("gses2.app").PathPrefix("/api").Subrouter()
+	return router
 }
 
-func setHandlers() {
+func setHandlers(router *mux.Router) {
 	router.HandleFunc("/rate", handlers.GetRateBTC).Methods("GET")
 	router.HandleFunc("/subscribe", handlers.SubscribeEmail).Methods("POST")
 	router.HandleFunc("/sendEmails", handlers.SendRateToEmails).Methods("POST")
-}
-
-func runService() {
-	log.Fatal(http.ListenAndServe(utils.Port, router))
 }

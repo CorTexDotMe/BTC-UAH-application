@@ -6,10 +6,6 @@ import (
 	"log"
 )
 
-func GetRateBTC() {
-	rate.GetBtcRateInUah()
-}
-
 func SubscribeEmail() {
 	error := repository.Add("")
 	if error != nil {

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"btcApp/internal/routes"
+	"btcApp/internal"
 )
 
 func main() {
-	routes.StartService()
+	internal.StartService()
 }

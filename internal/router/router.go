@@ -1,20 +1,9 @@
-package routes
+package router
 
 import (
 	"btcApp/internal/handlers"
-	"btcApp/internal/utils"
 	"github.com/gorilla/mux"
-	"log"
-	"net/http"
 )
-
-func StartService() {
-	runService(CreateInitialRouter())
-}
-
-func runService(router *mux.Router) {
-	log.Fatal(http.ListenAndServe(utils.Port, router))
-}
 
 func CreateInitialRouter() *mux.Router {
 	router := basicRouterInit()
@@ -29,7 +18,7 @@ func basicRouterInit() *mux.Router {
 }
 
 func setHandlers(router *mux.Router) {
-	router.HandleFunc("/rate", handlers.GetRateBTC).Methods("GET")
+	router.HandleFunc("/rate", handlers.GetBtcRateInUah).Methods("GET")
 	router.HandleFunc("/subscribe", handlers.SubscribeEmail).Methods("POST")
 	router.HandleFunc("/sendEmails", handlers.SendRateToEmails).Methods("POST")
 }

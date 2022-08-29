@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"btcApp/internal/routes"
+	"btcApp/internal/router"
 	"btcApp/test/utils"
 	"net/http"
 	"net/http/httptest"
@@ -15,7 +15,7 @@ type request struct {
 }
 
 func TestRouter(t *testing.T) {
-	router := routes.CreateInitialRouter()
+	testedRouter := router.CreateInitialRouter()
 	serverUrl := "http://gses2.app/api"
 
 	data := []request{
@@ -44,7 +44,7 @@ func TestRouter(t *testing.T) {
 	for _, testRequestData := range data {
 		request := httptest.NewRequest(testRequestData.method, serverUrl+testRequestData.route, nil)
 		recorder := httptest.NewRecorder()
-		router.ServeHTTP(recorder, request)
+		testedRouter.ServeHTTP(recorder, request)
 
 		if recorder.Code == testRequestData.expectedCode {
 			utils.Success(t, "%s returned code %d", testRequestData.route, testRequestData.expectedCode)

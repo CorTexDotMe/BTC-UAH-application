@@ -15,32 +15,28 @@ docker run -p 80:80 btc_app
 
 # Using the app
 
-As an example I provide command prompt curl commands to use the app on Windows.
+App can provide bitcoin rate in uah, subscribe email
+for getting bitcoin rate and send rate to subscribed emails
 
-File C:\Windows\System32\drivers\etc\hosts has to be changed. One line to add:
-
-```shell
-127.0.0.1 gses2.app
-```
 ### /rate
-```shell
-curl --location --request GET "gses2.app/api/rate"
-```
+
+**GET**
+
+BTC rate in UAH.
+Plain integer value
 
 ### /subscribe
-To subscribe 123example@gmail.com
 
-```shell
-curl --location --request POST "gses2.app/api/subscribe" \
---header "Content-Type: application/x-www-form-urlencoded" \
---data-urlencode "email=123example@gmail.com"
-```
-Same command in one line
-```shell
-curl --location --request POST "gses2.app/api/subscribe" --header "Content-Type: application/x-www-form-urlencoded" --data-urlencode "email=123example@gmail.com"
-```
+**POST. application/x-www-form-urlencoded**
+
+Subscribe email for future rate emails.
+Email should be sent as request body with key "email".
+
 ### /sendEmails
-```shell
-curl --location --request POST "gses2.app/api/sendEmails"
-```
 
+**POST**
+
+Send bitcoin rate to all subscribed emails 
+
+
+### More info can be found in api/swagger.yaml

@@ -8,6 +8,6 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o /btcApp btcApp
+RUN go build -o /btcApp ./cmd/...
 
 CMD ["/btcApp"]

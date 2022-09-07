@@ -18,7 +18,7 @@ func (d *Database) Initialize() {
 }
 
 func createFile(path string) *os.File {
-	file, creatingError := os.Create(path)
+	file, creatingError := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_RDONLY, 0644)
 	if creatingError != nil {
 		log.Print("File not created")
 	}

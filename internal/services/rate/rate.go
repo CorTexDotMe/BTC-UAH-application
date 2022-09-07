@@ -1,8 +1,8 @@
 package rate
 
 import (
-	"btcApp/internal/rate/parser"
-	"btcApp/internal/rate/service"
+	"btcApp/internal/services/rate/parser"
+	"btcApp/internal/services/rate/service"
 	"io/ioutil"
 	"net/http"
 )

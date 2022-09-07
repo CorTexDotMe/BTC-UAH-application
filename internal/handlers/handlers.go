@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"btcApp/internal/controller"
-	"btcApp/internal/rate"
+	"btcApp/internal/services/rate"
 	"btcApp/internal/utils"
 	"encoding/json"
 	"net/http"
@@ -45,5 +45,7 @@ func SubscribeEmail(writer http.ResponseWriter, request *http.Request) {
 }
 
 func SendRateToEmails(writer http.ResponseWriter, request *http.Request) {
-	//controller.SendRateToEmails()
+	defer utils.RecoverInternalError(writer)
+
+	controller.SendRateToEmails()
 }

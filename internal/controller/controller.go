@@ -1,8 +1,9 @@
 package controller
 
 import (
-	"btcApp/internal/rate"
 	"btcApp/internal/repository"
+	"btcApp/internal/services/email"
+	"btcApp/internal/services/rate"
 	"log"
 )
 
@@ -20,9 +21,12 @@ func SubscribeEmail(email string) bool {
 
 func SendRateToEmails() {
 	btcRate := rate.GetBtcRateInUah()
-	emails := repository.DB.GetAllEmails()
+	dialer := email.InitializeDialer()
+	initialMsg := email.InitializeMessage(btcRate)
 
-	for _, email := range emails {
-		log.Print(email, btcRate)
+	emails := repository.DB.GetAllEmails()
+	for _, emailToSendRate := range emails {
+		log.Print(emailToSendRate, btcRate)
+		email.SendEmail(emailToSendRate, initialMsg, dialer)
 	}
 }

@@ -13,6 +13,7 @@ func (d *Database) Contains(email string) bool {
 	if openingError != nil {
 		panic(openingError)
 	}
+	defer file.Close()
 
 	fileScanner := bufio.NewScanner(file)
 	for fileScanner.Scan() {
@@ -32,6 +33,7 @@ func (d *Database) Add(email string) error {
 	if openingError != nil {
 		panic(openingError)
 	}
+	defer file.Close()
 
 	_, writingError := file.WriteString(email + "\n")
 	if writingError != nil {
@@ -42,10 +44,10 @@ func (d *Database) Add(email string) error {
 }
 
 func (d *Database) GetAllEmails() []string {
-	file, err := ioutil.ReadFile(d.FullPath)
+	fileContent, err := ioutil.ReadFile(d.FullPath)
 	if err != nil {
 		log.Print("error while reading")
 	}
 
-	return strings.Split(string(file), "\n")
+	return strings.Split(string(fileContent), "\n")
 }

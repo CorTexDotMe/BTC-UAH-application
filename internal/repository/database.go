@@ -1,9 +1,12 @@
 package repository
 
 import (
+	"btcApp/internal/utils"
 	"log"
 	"os"
 )
+
+var DB *Database
 
 type Database struct {
 	FullPath string
@@ -21,4 +24,9 @@ func createFile(path string) *os.File {
 	}
 
 	return file
+}
+
+func InitializeDatabase() {
+	DB = &Database{FullPath: utils.EmailsFilePath + utils.EmailsFileName}
+	DB.Initialize()
 }

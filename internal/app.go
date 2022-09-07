@@ -10,14 +10,11 @@ import (
 )
 
 type App struct {
-	router   *mux.Router
-	database *repository.Database
+	router *mux.Router
 }
 
 func (a *App) Initialize() {
-	a.database = &repository.Database{FullPath: utils.EmailsFilePath + utils.EmailsFileName}
-	a.database.Initialize()
-
+	repository.InitializeDatabase()
 	a.router = router.CreateInitialRouter()
 }
 

@@ -35,7 +35,14 @@ func (d *Database) Add(email string) error {
 	}
 	defer file.Close()
 
-	_, writingError := file.WriteString(email + "\n")
+	var stringToWriteInFile string
+	if d.firstElementAdded {
+		stringToWriteInFile = "\n" + email
+	} else {
+		stringToWriteInFile = email
+		d.firstElementAdded = true
+	}
+	_, writingError := file.WriteString(stringToWriteInFile)
 	if writingError != nil {
 		return writingError
 	}

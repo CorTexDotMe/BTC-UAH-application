@@ -9,12 +9,15 @@ import (
 var DB *Database
 
 type Database struct {
-	FullPath string
+	FullPath          string
+	firstElementAdded bool
 }
 
 func (d *Database) Initialize() {
 	database := createFile(d.FullPath)
 	database.Close()
+
+	d.firstElementAdded = false
 }
 
 func createFile(path string) *os.File {

@@ -1,10 +1,12 @@
 package routes
 
 import (
+	"btcApp/internal/repository"
 	"btcApp/internal/router"
 	"btcApp/test/utils"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
@@ -15,6 +17,8 @@ type request struct {
 }
 
 func TestRouter(t *testing.T) {
+	setUp()
+	defer tearDown()
 	testedRouter := router.CreateInitialRouter()
 	serverUrl := "http://gses2.app/api"
 
@@ -27,7 +31,7 @@ func TestRouter(t *testing.T) {
 		{
 			"/subscribe",
 			http.MethodPost,
-			http.StatusOK,
+			http.StatusBadRequest,
 		},
 		{
 			"/sendEmails",
@@ -58,4 +62,13 @@ func TestRouter(t *testing.T) {
 			)
 		}
 	}
+}
+
+func setUp() {
+	repository.DB = &repository.Database{FullPath: "testDatabase.txt"}
+	repository.DB.Initialize()
+}
+
+func tearDown() {
+	os.Remove(repository.DB.FullPath)
 }

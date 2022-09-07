@@ -26,7 +26,7 @@ func SendRateToEmails() {
 
 	emails := repository.DB.GetAllEmails()
 	for _, emailToSendRate := range emails {
-		log.Print(emailToSendRate, btcRate)
+		log.Println(emailToSendRate)
 		email.SendEmail(emailToSendRate, initialMsg, dialer)
 	}
 }

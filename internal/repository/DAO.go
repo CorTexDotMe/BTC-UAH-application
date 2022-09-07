@@ -56,5 +56,6 @@ func (d *Database) GetAllEmails() []string {
 		log.Print("error while reading")
 	}
 
-	return strings.Split(string(fileContent), "\n")
+	stringWithAllEmails := string(fileContent)
+	return strings.Split(stringWithAllEmails, "\n")
 }

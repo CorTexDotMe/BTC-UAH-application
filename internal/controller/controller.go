@@ -4,6 +4,7 @@ import (
 	"btcApp/internal/repository"
 	"btcApp/internal/services/email"
 	"btcApp/internal/services/rate"
+	"btcApp/internal/utils"
 	"log"
 )
 
@@ -13,16 +14,15 @@ func SubscribeEmail(email string) bool {
 	}
 
 	databaseError := repository.DB.Add(email)
-	if databaseError != nil {
-		panic(databaseError)
-	}
+	utils.HandleUnexpectedError(databaseError)
+
 	return true
 }
 
 func SendRateToEmails() {
 	btcRate := rate.GetBtcRateInUah()
-	dialer := email.InitializeDialer()
 	initialMsg := email.InitializeMessage(btcRate)
+	dialer := email.InitializeDialer()
 
 	emails := repository.DB.GetAllEmails()
 	for _, emailToSendRate := range emails {

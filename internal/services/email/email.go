@@ -36,6 +36,6 @@ func InitializeMessage(btcRate int) *gomail.Message {
 func SendEmail(email string, initialMessage *gomail.Message, dialer *gomail.Dialer) {
 	initialMessage.SetHeader("To", email)
 	if err := dialer.DialAndSend(initialMessage); err != nil {
-		log.Println(err)
+		log.Printf("Unable to send message to \"%s\"\n", email)
 	}
 }

@@ -12,27 +12,16 @@ import (
 func GetBtcRateInUah(writer http.ResponseWriter, request *http.Request) {
 	defer utils.RecoverInternalError(writer)
 	btcUahRate := rate.GetBtcRateInUah()
-
-	returnBtcRateInUah(writer, btcUahRate)
-}
-
-func returnBtcRateInUah(writer http.ResponseWriter, btcUahRate int) {
-	writeResponseError := json.NewEncoder(writer).Encode(btcUahRate)
-	if writeResponseError != nil {
-		panic(writeResponseError)
-	}
+	writeBtcRateInResponse(writer, btcUahRate)
 }
 
 func SubscribeEmail(writer http.ResponseWriter, request *http.Request) {
 	defer utils.RecoverInternalError(writer)
 	parsingError := request.ParseForm()
-	if parsingError != nil {
-		panic(parsingError)
-	}
+	utils.HandleUnexpectedError(parsingError)
 
 	email := request.Form.Get("email")
-	_, err := mail.ParseAddress(email)
-	if err != nil {
+	if emailIsInvalid(email) {
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -46,6 +35,15 @@ func SubscribeEmail(writer http.ResponseWriter, request *http.Request) {
 
 func SendRateToEmails(writer http.ResponseWriter, request *http.Request) {
 	defer utils.RecoverInternalError(writer)
-
 	controller.SendRateToEmails()
+}
+
+func writeBtcRateInResponse(writer http.ResponseWriter, btcUahRate int) {
+	writeResponseError := json.NewEncoder(writer).Encode(btcUahRate)
+	utils.HandleUnexpectedError(writeResponseError)
+}
+
+func emailIsInvalid(email string) bool {
+	_, err := mail.ParseAddress(email)
+	return err != nil
 }

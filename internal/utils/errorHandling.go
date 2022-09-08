@@ -7,3 +7,9 @@ func RecoverInternalError(writer http.ResponseWriter) {
 		writer.WriteHeader(http.StatusInternalServerError)
 	}
 }
+
+func HandleUnexpectedError(err error) {
+	if err != nil {
+		panic(err)
+	}
+}

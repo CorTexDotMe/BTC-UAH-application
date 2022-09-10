@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"btcApp/internal/common/utils"
 	"encoding/json"
 )
 
@@ -21,9 +22,7 @@ func (r *coinsFromBtcRateService) getCoinPrice() float64 {
 func ParseJsonResponse(jsonWithRate []byte) int {
 	var coinsFromService coinsFromBtcRateService
 	parseJsonError := json.Unmarshal(jsonWithRate, &coinsFromService)
-	if parseJsonError != nil {
-		panic(parseJsonError)
-	}
+	utils.PanicIfUnexpectedErrorOccurs(parseJsonError)
 
 	return int(coinsFromService.getCoinPrice())
 }

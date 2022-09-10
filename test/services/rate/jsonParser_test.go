@@ -1,7 +1,7 @@
 package rate
 
 import (
-	"btcApp/internal/services/rate/parser"
+	"btcApp/internal/services/parser"
 	"btcApp/test/utils"
 	"testing"
 )

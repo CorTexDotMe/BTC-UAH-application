@@ -3,7 +3,6 @@ package handlers
 import (
 	"btcApp/internal/common/utils"
 	"btcApp/internal/controller"
-	"btcApp/internal/services/rate"
 	"encoding/json"
 	"net/http"
 	"net/mail"
@@ -11,7 +10,7 @@ import (
 
 func GetBtcRateInUah(writer http.ResponseWriter, request *http.Request) {
 	defer utils.RecoverInternalError(writer)
-	btcUahRate := rate.GetBtcRateInUah()
+	btcUahRate := controller.GetBtcRateInUah()
 	writeBtcRateInResponse(writer, btcUahRate)
 }
 

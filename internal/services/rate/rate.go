@@ -1,32 +1,13 @@
 package rate
 
 import (
-	"btcApp/internal/services/rate/parser"
-	"btcApp/internal/services/rate/service"
-	"io/ioutil"
+	"btcApp/internal/common/constants"
+	"btcApp/internal/common/utils"
 	"net/http"
 )
 
-func GetBtcRateInUah() int {
-	response := service.GetResponseFromBtcRateService()
-	defer closeResponseBody(response)
-
-	responseAsJson := readJson(response)
-	BtcRateInUah := parser.ParseJsonResponse(responseAsJson)
-	return BtcRateInUah
-}
-
-func closeResponseBody(response *http.Response) {
-	closingError := response.Body.Close()
-	if closingError != nil {
-		panic(closingError)
-	}
-}
-
-func readJson(response *http.Response) []byte {
-	body, readJsonError := ioutil.ReadAll(response.Body)
-	if readJsonError != nil {
-		panic(readJsonError)
-	}
-	return body
+func GetResponseFromBtcRateService() *http.Response {
+	response, getRateError := http.Get(constants.BtcUahRateServiceUrl)
+	utils.PanicIfUnexpectedErrorOccurs(getRateError)
+	return response
 }

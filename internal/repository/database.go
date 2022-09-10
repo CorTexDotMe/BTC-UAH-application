@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"btcApp/internal/utils"
+	"btcApp/internal/common/constants"
 	"log"
 	"os"
 )
@@ -30,6 +30,6 @@ func createFile(path string) *os.File {
 }
 
 func InitializeDatabase() {
-	DB = &Database{FullPath: utils.EmailsFilePath + utils.EmailsFileName}
+	DB = &Database{FullPath: constants.EmailsFilePath + constants.EmailsFileName}
 	DB.Initialize()
 }

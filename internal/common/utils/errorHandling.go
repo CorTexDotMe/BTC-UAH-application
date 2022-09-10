@@ -8,7 +8,7 @@ func RecoverInternalError(writer http.ResponseWriter) {
 	}
 }
 
-func HandleUnexpectedError(err error) {
+func PanicIfUnexpectedErrorOccurs(err error) {
 	if err != nil {
 		panic(err)
 	}

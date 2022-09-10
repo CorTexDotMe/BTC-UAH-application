@@ -1,9 +1,9 @@
 package handlers
 
 import (
+	"btcApp/internal/common/utils"
 	"btcApp/internal/controller"
 	"btcApp/internal/services/rate"
-	"btcApp/internal/utils"
 	"encoding/json"
 	"net/http"
 	"net/mail"
@@ -18,7 +18,7 @@ func GetBtcRateInUah(writer http.ResponseWriter, request *http.Request) {
 func SubscribeEmail(writer http.ResponseWriter, request *http.Request) {
 	defer utils.RecoverInternalError(writer)
 	parsingError := request.ParseForm()
-	utils.HandleUnexpectedError(parsingError)
+	utils.PanicIfUnexpectedErrorOccurs(parsingError)
 
 	email := request.Form.Get("email")
 	if emailIsInvalid(email) {
@@ -40,7 +40,7 @@ func SendRateToEmails(writer http.ResponseWriter, request *http.Request) {
 
 func writeBtcRateInResponse(writer http.ResponseWriter, btcUahRate int) {
 	writeResponseError := json.NewEncoder(writer).Encode(btcUahRate)
-	utils.HandleUnexpectedError(writeResponseError)
+	utils.PanicIfUnexpectedErrorOccurs(writeResponseError)
 }
 
 func emailIsInvalid(email string) bool {

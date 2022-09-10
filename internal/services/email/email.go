@@ -1,10 +1,10 @@
 package email
 
 import (
-	"btcApp/internal/utils"
 	"fmt"
 	"gopkg.in/gomail.v2"
 	"log"
+	"os"
 )
 
 func InitializeDialer() *gomail.Dialer {
@@ -14,8 +14,8 @@ func InitializeDialer() *gomail.Dialer {
 	dialer := gomail.NewDialer(
 		host,
 		port,
-		utils.AppEmail,
-		utils.AppEmailPassword,
+		os.Getenv("APPLICATION_EMAIL_ADDRESS"),
+		os.Getenv("APPLICATION_EMAIL_PASSWORD"),
 	)
 
 	return dialer
@@ -26,7 +26,7 @@ func InitializeMessage(btcRate int) *gomail.Message {
 	body := fmt.Sprintf("BTC rate in UAH: %d", btcRate)
 
 	msg := gomail.NewMessage()
-	msg.SetHeader("From", utils.AppEmail)
+	msg.SetHeader("From", os.Getenv("APPLICATION_EMAIL_ADDRESS"))
 	msg.SetHeader("Subject", subject)
 	msg.SetBody("text/plain", body)
 

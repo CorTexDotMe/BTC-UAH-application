@@ -1,9 +1,9 @@
 package internal
 
 import (
+	"btcApp/internal/common/constants"
 	"btcApp/internal/repository"
 	"btcApp/internal/router"
-	"btcApp/internal/utils"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -23,5 +23,5 @@ func (a *App) Run() {
 }
 
 func runService(router *mux.Router) {
-	log.Fatal(http.ListenAndServe(utils.Port, router))
+	log.Fatal(http.ListenAndServe(constants.Port, router))
 }

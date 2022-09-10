@@ -1,10 +1,10 @@
 package controller
 
 import (
+	"btcApp/internal/common/utils"
 	"btcApp/internal/repository"
 	"btcApp/internal/services/email"
 	"btcApp/internal/services/rate"
-	"btcApp/internal/utils"
 	"log"
 )
 
@@ -14,7 +14,7 @@ func SubscribeEmail(email string) bool {
 	}
 
 	databaseError := repository.DB.Add(email)
-	utils.HandleUnexpectedError(databaseError)
+	utils.PanicIfUnexpectedErrorOccurs(databaseError)
 
 	return true
 }

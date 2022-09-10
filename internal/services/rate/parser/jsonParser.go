@@ -1,9 +1,10 @@
 package parser
 
 import (
-	"btcApp/internal/utils"
 	"encoding/json"
 )
+
+const IdOfUahInJsonFromRateService = 0
 
 type coinsFromBtcRateService struct {
 	Coins []coin
@@ -14,7 +15,7 @@ type coin struct {
 }
 
 func (r *coinsFromBtcRateService) getCoinPrice() float64 {
-	return r.Coins[utils.IdOfUahInJsonFromRateService].Price
+	return r.Coins[IdOfUahInJsonFromRateService].Price
 }
 
 func ParseJsonResponse(jsonWithRate []byte) int {

@@ -30,7 +30,8 @@ func TestHandleRate(t *testing.T) {
 		utils.Failure(t, "Error while reading result body")
 	}
 
-	parsedBtcRate, parsingError := strconv.Atoi(string(data))
+	btcRateAsString := strings.TrimSuffix(string(data), "\n")
+	parsedBtcRate, parsingError := strconv.Atoi(btcRateAsString)
 	if parsingError != nil {
 		utils.Failure(t, "Error while reading result body")
 	} else {
